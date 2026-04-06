@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Foundry Test Module</title>
+  <style>
+    body { font-family: sans-serif; padding: 32px; background: #f0f4ff; }
+    h1 { color: #1976d2; }
+    .status { background: #e3f2fd; padding: 16px; border-radius: 8px; margin: 16px 0; }
+    button { background: #1976d2; color: white; border: none; padding: 12px 24px;
+             border-radius: 6px; font-size: 16px; cursor: pointer; margin: 8px 0; }
+    button:hover { background: #1565c0; }
+    pre { background: #fff; padding: 12px; border-radius: 6px; font-size: 13px;
+          border: 1px solid #ddd; white-space: pre-wrap; }
+  </style>
+</head>
+<body>
+  <h1>Hello from WebView</h1>
+  <div class="status">
+    <strong>Static test module</strong> — served from Flutter assets via local HTTP server.
+  </div>
+
+  <button onclick="testPing()">Ping Bridge</button>
+  <button onclick="testPhoto()">Capture Photo (stub)</button>
+
+  <h3>Bridge Response:</h3>
+  <pre id="output">Tap a button to test the bridge...</pre>
+
+  <script>
+    async function testPing() {
+      document.getElementById('output').textContent = 'Calling ping...';
+      try {
+        const result = await window.shellBridge.ping();
+        document.getElementById('output').textContent = JSON.stringify(result, null, 2);
+      } catch (e) {
+        document.getElementById('output').textContent = 'Error: ' + e.message;
+      }
+    }
+
+    async function testPhoto() {
+      document.getElementById('output').textContent = 'Calling capturePhoto...';
+      try {
+        const result = await window.shellBridge.capturePhoto({});
+        document.getElementById('output').textContent = JSON.stringify(result, null, 2);
+      } catch (e) {
+        document.getElementById('output').textContent = 'Error: ' + e.message;
+      }
+    }
+  </script>
+</body>
+</html>
