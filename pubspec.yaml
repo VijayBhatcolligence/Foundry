@@ -1,0 +1,64 @@
+name: foundry_app
+description: Foundry App - Flutter shell for dynamic React modules
+version: 1.0.0+1
+publish_to: 'none'
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # WebView
+  webview_flutter: ^4.4.0
+  webview_flutter_android: ^3.12.0
+  webview_flutter_wkwebview: ^3.9.0
+
+  # Local HTTP server
+  shelf: ^1.4.0
+  shelf_static: ^1.1.0
+
+  # File system & paths
+  path_provider: ^2.1.0
+  path: ^1.8.3
+
+  # Network
+  http: ^1.1.0
+  connectivity_plus: 5.0.0
+
+  # Phase 2: Auth
+  flutter_secure_storage: ^9.0.0
+  firebase_core: ^3.6.0
+  firebase_auth: ^5.3.1
+  flutter_dotenv: ^5.1.0
+
+  # Crypto (Phase 3 checksum)
+  crypto: ^3.0.3
+
+  # Phase 4: Native capabilities
+  image_picker: ^1.1.2
+  mobile_scanner: ^5.2.3
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+  flutter_launcher_icons: ^0.13.1
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/test_module/
+    - assets/modules/quality-inspector/
+    - assets/modules/inventory-checker/
+    - assets/icon/
+    - .env
+
+flutter_icons:
+  android: true
+  ios: false
+  image_path: "assets/icon/icon.png"
+  adaptive_icon_background: "#ffffff"
+  adaptive_icon_foreground: "assets/icon/icon.png"
+  min_sdk_android: 21
