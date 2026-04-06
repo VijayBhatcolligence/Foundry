@@ -9,7 +9,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:819068716771:android:5bec05571a510b0f0e67d6",
         "android_client_info": {
-          "package_name": "com.foundry.app"
+          "package_name": "in.colligence.foundry.position"
         }
       },
       "oauth_client": [],
