@@ -1,4 +1,4 @@
-package com.example.foundry_app
+package in.colligence.foundry.position
 
 import io.flutter.embedding.android.FlutterActivity
 

@@ -14,7 +14,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.foundry_app"
+    namespace = "in.colligence.foundry.position"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
