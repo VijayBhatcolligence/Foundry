@@ -38,7 +38,7 @@ dependencies:
 
   # Phase 4: Native capabilities
   image_picker: ^1.1.2
-  mobile_scanner: ^5.2.3
+  mobile_scanner: ^7.0.0
 
 dev_dependencies:
   flutter_test:
