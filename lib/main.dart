@@ -6,17 +6,26 @@ import 'screens/loading_screen.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Load .env (API_BASE_URL etc.)
-  await dotenv.load(fileName: '.env');
+  String? initError;
 
-  // Init Firebase (google-services.json already in android/app/)
-  await Firebase.initializeApp();
+  try {
+    await dotenv.load(fileName: '.env');
+  } catch (e) {
+    initError = 'Failed to load .env: $e';
+  }
 
-  runApp(const FoundryApp());
+  try {
+    await Firebase.initializeApp();
+  } catch (e) {
+    initError = 'Firebase init failed: $e';
+  }
+
+  runApp(FoundryApp(initError: initError));
 }
 
 class FoundryApp extends StatelessWidget {
-  const FoundryApp({super.key});
+  final String? initError;
+  const FoundryApp({super.key, this.initError});
 
   @override
   Widget build(BuildContext context) {
@@ -31,8 +40,20 @@ class FoundryApp extends StatelessWidget {
         useMaterial3: true,
         scaffoldBackgroundColor: const Color(0xFF1A1A2E),
       ),
-      // LoadingScreen checks stored JWT → routes to LoginScreen or ShellScreen
-      home: const LoadingScreen(),
+      home: initError != null
+          ? Scaffold(
+              body: Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(32),
+                  child: Text(
+                    initError!,
+                    style: const TextStyle(color: Colors.red, fontSize: 16),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ),
+            )
+          : const LoadingScreen(),
     );
   }
 }
