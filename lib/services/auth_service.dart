@@ -129,4 +129,48 @@ class AuthService {
     await _storage.delete(key: _tokenKey);
     await _storage.delete(key: _userKey);
   }
+
+  /// Delete the user's account from backend, Firebase, and local storage.
+  /// Requires [email] and [password] for Firebase re-authentication.
+  Future<void> deleteAccount(String email, String password) async {
+    final firebaseUser = _auth.currentUser;
+    if (firebaseUser == null) throw Exception('Not signed in');
+
+    // 1. Re-authenticate (required by Firebase before account deletion)
+    final credential = EmailAuthProvider.credential(
+      email: email,
+      password: password,
+    );
+    await firebaseUser.reauthenticateWithCredential(credential);
+
+    // 2. Call backend to delete user data
+    final token = await getToken();
+    if (token != null) {
+      try {
+        final response = await http.delete(
+          Uri.parse('$_apiBase/api/auth/account'),
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer $token',
+          },
+        );
+        // Accept success or 404 (already deleted)
+        if (response.statusCode != 200 &&
+            response.statusCode != 204 &&
+            response.statusCode != 404) {
+          print('[AuthService] Backend deletion returned ${response.statusCode}');
+        }
+      } catch (e) {
+        // Backend unreachable — proceed with Firebase deletion anyway
+        print('[AuthService] Backend deletion failed: $e');
+      }
+    }
+
+    // 3. Delete Firebase account
+    await firebaseUser.delete();
+
+    // 4. Clear all local data
+    await _storage.delete(key: _tokenKey);
+    await _storage.delete(key: _userKey);
+  }
 }

@@ -83,4 +83,32 @@ class ModuleDownloadService {
 
     print('[ModuleDownload] Downloaded ${entry.slug} ${entry.version} → $dirPath');
   }
+
+  /// Delete all downloaded module bundles from local storage.
+  /// Returns the total bytes freed. Does NOT delete auth tokens.
+  static Future<int> clearLocalCache() async {
+    int freedBytes = 0;
+    try {
+      final appDocDir = await getApplicationDocumentsDirectory();
+      final modulesDir = Directory(path.join(appDocDir.path, 'modules'));
+      if (modulesDir.existsSync()) {
+        await for (final entity in modulesDir.list(recursive: true)) {
+          if (entity is File) {
+            freedBytes += await entity.length();
+          }
+        }
+        await modulesDir.delete(recursive: true);
+        print('[ModuleDownload] Cleared local cache ($freedBytes bytes)');
+      }
+      // Also clear the version cache file so modules re-download on next launch
+      final cacheFile = File(path.join(appDocDir.path, 'modules_cache.json'));
+      if (cacheFile.existsSync()) {
+        freedBytes += await cacheFile.length();
+        await cacheFile.delete();
+      }
+    } catch (e) {
+      print('[ModuleDownload] Error clearing cache: $e');
+    }
+    return freedBytes;
+  }
 }

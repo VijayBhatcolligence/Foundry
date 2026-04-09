@@ -1,6 +1,6 @@
 name: foundry_app
 description: Foundry App - Flutter shell for dynamic React modules
-version: 1.0.0+2
+version: 1.0.0+1
 publish_to: 'none'
 
 environment:
@@ -38,7 +38,7 @@ dependencies:
 
   # Phase 4: Native capabilities
   image_picker: ^1.1.2
-  mobile_scanner: ^7.0.0
+  mobile_scanner: ^5.2.3
 
 dev_dependencies:
   flutter_test:
@@ -53,6 +53,7 @@ flutter:
     - assets/modules/quality-inspector/
     - assets/modules/inventory-checker/
     - assets/icon/
+    - assets/legal/
     - .env
 
 flutter_icons:

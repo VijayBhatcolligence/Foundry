@@ -4,6 +4,7 @@ import '../services/local_http_server.dart';
 import '../services/auth_service.dart';
 import '../services/module_registry_service.dart';
 import '../webview/module_webview.dart';
+import '../widgets/delete_account_dialog.dart';
 import 'login_screen.dart';
 
 class ModuleListScreen extends StatefulWidget {
@@ -120,10 +121,28 @@ class _ModuleListScreenState extends State<ModuleListScreen> {
                 : 'Foundry',
           ),
           actions: [
-            IconButton(
-              icon: const Icon(Icons.logout),
-              tooltip: 'Sign out',
-              onPressed: _logout,
+            PopupMenuButton<String>(
+              icon: const Icon(Icons.more_vert),
+              color: const Color(0xFF16213E),
+              onSelected: (value) {
+                if (value == 'logout') _logout();
+                if (value == 'delete') {
+                  showDialog(
+                    context: context,
+                    builder: (_) => const DeleteAccountDialog(),
+                  );
+                }
+              },
+              itemBuilder: (_) => [
+                const PopupMenuItem(
+                  value: 'logout',
+                  child: Text('Log Out', style: TextStyle(color: Colors.white)),
+                ),
+                const PopupMenuItem(
+                  value: 'delete',
+                  child: Text('Delete Account', style: TextStyle(color: Colors.redAccent)),
+                ),
+              ],
             ),
           ],
         ),

@@ -4,6 +4,7 @@ import '../services/module_registry_service.dart';
 import '../services/module_download_service.dart';
 import 'login_screen.dart';
 import 'module_list_screen.dart';
+import 'dashboard_screen.dart';
 
 class LoadingScreen extends StatefulWidget {
   const LoadingScreen({super.key});
@@ -98,7 +99,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
 
     if (!mounted) return;
     Navigator.of(context).pushReplacement(
-      MaterialPageRoute(builder: (_) => ModuleListScreen(modules: modulesToLoad)),
+      MaterialPageRoute(builder: (_) => DashboardScreen(modules: modulesToLoad)),
     );
   }
 
