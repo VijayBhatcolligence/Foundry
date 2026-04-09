@@ -25,7 +25,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   Map<String, dynamic> _authContext = {};
   bool _serverReady = false;
-  String _serverStatus = 'Starting...';
+  String _serverStatus = 'Initializing...';
   bool _serverError = false;
   String? _baseUrl;
 
@@ -78,7 +78,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   Future<void> _startServer() async {
-    setState(() { _serverStatus = 'Starting local server...'; _serverError = false; });
+    setState(() { _serverStatus = 'Initializing...'; _serverError = false; });
 
     final token = await AuthService().getToken();
     final user = await AuthService().getCachedUser();
