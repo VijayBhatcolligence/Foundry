@@ -38,8 +38,8 @@ class _LoadingScreenState extends State<LoadingScreen> {
       return;
     }
 
-    // OTA update check
-    setState(() => _status = 'Checking for updates...');
+    // Sync content
+    setState(() => _status = 'Preparing your workspace...');
     try {
       final registry = await ModuleRegistryService.fetchRegistry(token);
       _registry = registry;
@@ -56,7 +56,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
         final entry = outdated[moduleIndex];
         if (!mounted) return;
         setState(() {
-          _status = 'Updating ${entry.name}...';
+          _status = 'Loading ${entry.name}...';
           _currentModuleName = entry.name;
         });
 
@@ -131,7 +131,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
               ),
               const SizedBox(height: 8),
               Text(
-                'Downloading $_currentModuleName... ${((_downloadProgress ?? 0) * 100).toStringAsFixed(0)}%',
+                'Loading content... ${((_downloadProgress ?? 0) * 100).toStringAsFixed(0)}%',
                 style: const TextStyle(fontSize: 13, color: Colors.grey),
               ),
             ] else

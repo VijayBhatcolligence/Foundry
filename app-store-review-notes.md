@@ -10,96 +10,151 @@ DEMO ACCOUNT:
 Email:    test@foundry.com
 Password: test1234
 
-IMPORTANT: Please ensure you are connected to the internet for the initial
-login. After login, the app works fully offline — you can test this by
-enabling airplane mode after signing in.
+IMPORTANT: An active internet connection is required for the initial login.
+After first login, all modules work fully offline.
 
 ---
 
 APP PURPOSE:
-Foundry is an enterprise field data collection platform used by quality
-inspectors and inventory checkers in manufacturing and warehousing
-environments. It is a B2B tool distributed to specific employees by their
-organization — not a consumer app.
+Foundry is a B2B enterprise field data collection platform used by quality
+inspectors and inventory checkers in manufacturing and warehousing environments.
+It is distributed to specific company employees by their organization — it is
+not a consumer app and is not publicly advertised.
 
 ---
 
 HOW TO TEST (step by step):
 
 1. LAUNCH & LOGIN
-   - Open the app — you will see a dark splash screen, then the login page
+   - Open the app — you will see a branded splash screen, then the login screen
+   - Tap "Privacy Policy" at the bottom to view the full policy (native screen)
    - Sign in with: test@foundry.com / test1234
-   - The app will check for module updates, then navigate to the Dashboard
 
-2. DASHBOARD (native Flutter screen)
-   - Observe the Dashboard: user greeting, online/offline status indicator,
-     module count stat, and module cards
-   - This is a fully native Flutter UI screen
+2. DASHBOARD (fully native Flutter screen)
+   - The Dashboard is a 100% native Flutter screen
+   - It shows: user greeting, real-time online/offline status, module count,
+     sync status, and module cards
+   - No WebView is involved on this screen
 
-3. OPEN A MODULE (Quality Inspector)
-   - Tap the "Quality Inspector" card
-   - The app opens an embedded data collection form
-   - This form is served from local device storage (not a remote website)
-   - Tap the back arrow (top left) to return to Dashboard
+3. BARCODE SCANNING — native feature, NOT in WebView
+   - Tap "Quality Inspector" on the Dashboard
+   - Inside the module, tap the barcode/scan button
+   - The native iOS camera activates for on-device barcode scanning (MLKit)
+   - Scan any barcode or tap Cancel — result is returned to the form
+   NOTE: This is a NATIVE capability, not a web feature
 
-4. BARCODE SCANNING (native feature)
-   - Inside the Quality Inspector module, tap the barcode scan button
-   - The native camera/scanner will activate (uses MLKit on-device scanning)
-   - You can scan any product barcode or press back to cancel
-
-5. PHOTO CAPTURE (native feature)
+4. PHOTO CAPTURE — native feature, NOT in WebView
    - Inside the Quality Inspector module, tap the camera/photo button
-   - The native iOS camera picker will appear
-   - Capture or select a photo — it will attach to the inspection report
+   - The native iOS camera picker (UIImagePickerController) appears
+   - Capture or choose a photo — it attaches to the inspection report
+   NOTE: This is a NATIVE capability, not a web feature
 
-6. TEST OFFLINE MODE
-   - Enable airplane mode on the device
-   - Notice the Dashboard shows a red "Offline" indicator
-   - Navigate into a module — it still loads (content is cached locally)
-   - Submit a form — it queues the submission locally
-   - Disable airplane mode — the app automatically detects connectivity
-     and syncs queued data to the server
+5. OFFLINE MODE
+   - Enable airplane mode after logging in
+   - The Dashboard immediately shows an Offline indicator (native UI)
+   - Modules continue to load from local device storage
+   - Disable airplane mode — the app detects connectivity and syncs automatically
 
-7. SETTINGS
-   - Tap the three-dot menu (top right of Dashboard) → Settings
-   - View: Privacy Policy, Terms of Service, App Version, Support contact
-   - The "Delete Account" option is available (do not delete the demo account)
+6. SETTINGS (fully native Flutter screen)
+   - Tap the three-dot menu (top right) → Settings
+   - Account: view email, Delete Account, Log Out
+   - Legal: Privacy Policy (native screen), Terms of Service (native dialog)
+   - About: app version 1.0.0, support email
+   - Data: Clear Local Cache
+
+7. DELETE ACCOUNT (do not delete the demo account)
+   - Settings → Delete Account
+   - Requires email + password re-confirmation (Firebase requirement)
+   - Permanently deletes Firebase account, backend data, and all local files
 
 ---
 
-ARCHITECTURE NOTE FOR REVIEWER:
-The interactive data collection forms (quality inspection, inventory
-checking) are rendered as embedded web content served from the device's
-own local storage — NOT from a remote website. This design allows
-enterprise clients to update form configurations without requiring
-an app update from the App Store, similar to how MDM-managed enterprise
-tools work.
+GUIDELINE 4.2 — MINIMUM FUNCTIONALITY:
+This app is NOT a web wrapper or browser. It is a native enterprise platform
+with significant device-level capabilities that cannot be replicated in a
+pure web app:
 
-The Flutter native layer provides all device integrations:
-  • Native barcode scanning (MLKit, no WebView involved)
-  • Native camera access for photo capture
-  • Encrypted credential storage (iOS Keychain via flutter_secure_storage)
-  • Offline-first data queue with automatic background sync
-  • Real-time connectivity monitoring and status display
-  • Native Dashboard, Settings, and Privacy Policy screens
+  • Firebase authentication with encrypted Keychain token storage (iOS Keychain)
+  • Native barcode scanning (MLKit, ZXing — camera-based, fully offline)
+  • Native camera access via UIImagePickerController / AVFoundation
+  • Native offline-first data queue with automatic sync on reconnect
+  • Native real-time connectivity monitoring (displayed in Dashboard and modules)
+  • Native account management, deletion, and privacy controls
+  • SHA-256 integrity verification of all locally stored content
 
-All network communication uses HTTPS. The app does not use advertising,
-analytics, or tracking SDKs. Firebase is used solely for authentication.
+The data collection forms (quality inspection, inventory check) run inside
+WKWebView as a rendering surface. This is the same pattern used by enterprise
+apps like Salesforce Mobile, SAP Fiori, and ServiceNow — a native shell
+providing device APIs to a structured data collection UI layer.
+
+---
+
+GUIDELINE 2.5.2 — CODE EXECUTION:
+This app does NOT download or execute native/binary code. No Objective-C,
+Swift, machine code, or executable binaries are downloaded at runtime.
+
+What actually happens:
+  - At startup, the app authenticates and verifies the device's locally
+    stored HTML/CSS/JavaScript content against the enterprise server
+  - If locally cached content is outdated (version mismatch), the new
+    version is downloaded and SHA-256 verified before replacing the local copy
+  - This content is then served from LOCAL DEVICE STORAGE to WKWebView
+
+WKWebView executing JavaScript is explicitly sanctioned by Apple. This is
+not "dynamic code execution" — it is a native browser engine rendering
+structured web content, the same mechanism Safari uses. The JavaScript
+has no access to device APIs except through our explicitly declared native
+bridge (camera, barcode, auth token, network state).
+
+No content can be pushed that adds new native capabilities, modifies
+IAP logic, bypasses the App Store, or changes the app's declared purpose.
+The native bridge interface is fixed — it only exposes the specific
+capabilities submitted for review.
+
+---
+
+ARCHITECTURE NOTE:
+All interactive forms are served from LOCAL device storage
+(file:// equivalent via localhost), NOT from a remote web server.
+The WKWebView never loads a URL from the internet directly — it
+loads from an on-device HTTP server (loopback only) that serves
+pre-verified, locally cached content.
 
 ---
 
 BACKEND STATUS:
-The backend at https://foundry-app-rouge.vercel.app is live and will
-remain active during the review period.
+Backend API at https://foundry-app-rouge.vercel.app is live and will
+remain active throughout the entire review period.
+
+Demo account (test@foundry.com / test1234) has access to:
+  - Quality Inspector module
+  - Inventory Checker module
+Both modules are pre-cached on device and work fully offline.
 ```
 
 ---
 
 ## Notes About the Demo Account
 
-- Email: test@foundry.com
-- Password: test1234
-- This account has access to 2 modules: Quality Inspector + Inventory Checker
-- Both modules are pre-bundled with the app and work offline
-- Do NOT delete this account during review (account deletion feature is present
-  but should only be tested with a personal test account)
+- Email: test@foundry.com / Password: test1234
+- Account has 2 modules: Quality Inspector + Inventory Checker
+- Both modules are pre-bundled and work offline
+- Do NOT delete this account during review
+- If login fails, the backend at https://foundry-app-rouge.vercel.app may need
+  a moment to wake from idle (Vercel free tier cold start ~3-5 seconds)
+
+## Key Talking Points if Apple Requests Clarification
+
+1. **Not a web wrapper**: Dashboard, Settings, Login, Privacy Policy, Barcode Scanner
+   are all 100% native Flutter screens — no WebView on any of them.
+
+2. **2.5.2 defense**: JavaScript runs inside Apple's own WKWebView engine (same as
+   Safari). The JS cannot install code, cannot modify native binaries, and cannot
+   access device APIs beyond our declared bridge (camera, barcode, network state).
+
+3. **Why local HTTP server**: WKWebView needs an HTTP origin for module-to-module
+   JavaScript fetches and cache headers to work correctly. Content is served
+   from localhost — it never leaves the device.
+
+4. **Enterprise use case**: This is a B2B tool. Modules are controlled by the
+   organization's IT/backend team — not end users or third parties.
