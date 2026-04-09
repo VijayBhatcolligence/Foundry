@@ -49,6 +49,12 @@
 	</dict>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>Foundry App needs camera access to scan barcodes and capture photos for quality inspections and inventory reports.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Foundry App needs photo library access to attach existing photos to inspection and inventory reports.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Foundry App needs permission to save captured photos to your photo library.</string>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>

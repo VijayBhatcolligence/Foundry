@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../services/auth_service.dart';
 import 'loading_screen.dart';
+import 'privacy_policy_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -111,6 +112,23 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         )
                       : const Text('Sign In', style: TextStyle(fontSize: 16)),
+                ),
+                const SizedBox(height: 16),
+                GestureDetector(
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const PrivacyPolicyScreen()),
+                  ),
+                  child: const Text(
+                    'Privacy Policy',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Colors.white38,
+                      fontSize: 13,
+                      decoration: TextDecoration.underline,
+                      decorationColor: Colors.white38,
+                    ),
+                  ),
                 ),
               ],
             ),

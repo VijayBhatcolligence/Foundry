@@ -53,6 +53,7 @@ flutter:
     - assets/modules/quality-inspector/
     - assets/modules/inventory-checker/
     - assets/icon/
+    - assets/legal/
     - .env
 
 flutter_icons:
