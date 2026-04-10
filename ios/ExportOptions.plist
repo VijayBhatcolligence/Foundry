@@ -12,6 +12,11 @@
 	<string>manual</string>
 	<key>signingCertificate</key>
 	<string>Apple Distribution</string>
+	<key>provisioningProfiles</key>
+	<dict>
+		<key>in.colligence.foundry.position</key>
+		<string>Foundry Position iOS App Store</string>
+	</dict>
 	<key>uploadSymbols</key>
 	<true/>
 	<key>compileBitcode</key>
