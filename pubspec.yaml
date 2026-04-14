@@ -1,6 +1,6 @@
 name: foundry_app
 description: Foundry App - Flutter shell for dynamic React modules
-version: 1.0.0+3
+version: 1.0.0+1
 publish_to: 'none'
 
 environment:
@@ -58,7 +58,7 @@ flutter:
 
 flutter_icons:
   android: true
-  ios: false
+  ios: true
   image_path: "assets/icon/icon.png"
   adaptive_icon_background: "#ffffff"
   adaptive_icon_foreground: "assets/icon/icon.png"
