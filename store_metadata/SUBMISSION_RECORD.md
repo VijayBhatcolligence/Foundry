@@ -8,7 +8,7 @@
 2026-04-13 (Attempt 1) → 2026-04-15 (Attempt 2)
 
 ## Build Version
-1.0.0+3
+1.0.0+4 (next submission — Phase 12)
 
 ## Bundle ID
 in.colligence.foundry.position
@@ -79,10 +79,17 @@ getAuthToken, getNetworkState, readFile. No raw platform APIs are
 exposed. No new capabilities can be added post-submission without
 an app update. The bridge is tightly scoped by design.
 
+All downloaded module bundles are verified with ECDSA P-256 SHA-256
+digital signatures before execution. The signing private key is held
+exclusively by the organization's IT administrator. Any bundle not
+signed by that key is rejected by the app before being written to disk.
+This ensures that only administrator-approved content ever executes,
+even in the event of CDN or network compromise.
+
 4.7.4 — Module index: The app serves 2 modules at submission time:
-  1. Quality Inspector (slug: quality-inspector, v1.2.1) —
+  1. Quality Inspector (slug: quality-inspector, v1.2.2) —
      logs product non-conformances with photo capture
-  2. Inventory Checker (slug: inventory-checker, v1.1.2) —
+  2. Inventory Checker (slug: inventory-checker, v1.1.3) —
      records stock counts by SKU and location
 
 All modules are HTML + JavaScript rendered in WKWebView. No native
@@ -99,6 +106,7 @@ executable code is downloaded at any point.
 ## Encryption
 - ITSAppUsesNonExemptEncryption = false (set in Info.plist)
 - Uses only standard HTTPS/TLS, Firebase Auth (TLS), and OS keychain
+- Phase 12 added ECDSA P-256 SHA-256 bundle signature **verification** (public key only, hardcoded in binary). No encryption of user data. No private key in the app. This is authentication/digital signature use — exempt under EAR §740.17(b) and Apple's standard cryptography exemption. ITSAppUsesNonExemptEncryption remains false.
 
 ---
 
@@ -133,6 +141,7 @@ Conducted against official Apple App Store Review Guidelines. Overall passing li
 | 2.4 Hardware Compatibility | PASS | iPhone + iPad supported |
 | 4.2 Minimum Functionality | PASS | Camera, barcode, offline queue, secure auth — not just a web wrapper |
 | 4.7 Mini Apps / Dynamic JS | RISK | Review notes updated to address 4.7.1, 4.7.2, 4.7.4 explicitly |
+| 4.7.2 Bundle Integrity | PASS | Phase 12: ECDSA P-256 signatures verify all downloaded bundles — no unsigned code executes |
 | 4.8 Login Services | PASS | Enterprise email/password auth, exempt from Sign in with Apple |
 | 5.1 Privacy | PASS | PrivacyInfo.xcprivacy present, NSPrivacyTracking = false |
 | 5.1.2 Data Sharing | PASS | No third-party data sharing |
