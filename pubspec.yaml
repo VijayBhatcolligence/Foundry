@@ -40,6 +40,9 @@ dependencies:
   image_picker: ^1.1.2
   mobile_scanner: ^6.0.0
 
+  # Phase 12: Bundle signing verification
+  cryptography: ^2.7.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

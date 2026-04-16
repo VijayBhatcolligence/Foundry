@@ -12,6 +12,7 @@ class ModuleEntry {
   final String cdnUrl;
   final String indexUrl;
   final String checksum;
+  final String signature;
 
   ModuleEntry({
     required this.slug,
@@ -20,15 +21,17 @@ class ModuleEntry {
     required this.cdnUrl,
     required this.indexUrl,
     required this.checksum,
+    required this.signature,
   });
 
   factory ModuleEntry.fromJson(Map<String, dynamic> j) => ModuleEntry(
-        slug: j['slug'] as String,
-        name: j['name'] as String,
-        version: j['version'] as String,
-        cdnUrl: j['cdn_url'] as String,
-        indexUrl: j['index_url'] as String,
-        checksum: j['checksum'] as String,
+        slug:      j['slug']      as String,
+        name:      j['name']      as String,
+        version:   j['version']   as String,
+        cdnUrl:    j['cdn_url']   as String,
+        indexUrl:  j['index_url'] as String,
+        checksum:  j['checksum']  as String,
+        signature: (j['signature'] as String?) ?? '',
       );
 }
 

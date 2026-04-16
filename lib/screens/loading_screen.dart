@@ -3,7 +3,6 @@ import '../services/auth_service.dart';
 import '../services/module_registry_service.dart';
 import '../services/module_download_service.dart';
 import 'login_screen.dart';
-import 'module_list_screen.dart';
 import 'dashboard_screen.dart';
 
 class LoadingScreen extends StatefulWidget {
@@ -16,13 +15,13 @@ class LoadingScreen extends StatefulWidget {
 class _LoadingScreenState extends State<LoadingScreen> {
   String _status = 'Loading...';
   double? _downloadProgress;
-  String _currentModuleName = '';
+  String? _signatureError;
   List<ModuleEntry> _registry = [];
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) => _checkAuth());
+    _checkAuth();
   }
 
   Future<void> _checkAuth() async {
@@ -57,7 +56,6 @@ class _LoadingScreenState extends State<LoadingScreen> {
         if (!mounted) return;
         setState(() {
           _status = 'Loading ${entry.name}...';
-          _currentModuleName = entry.name;
         });
 
         try {
@@ -81,17 +79,27 @@ class _LoadingScreenState extends State<LoadingScreen> {
               });
             },
           );
+        } on BundleSignatureException catch (e) {
+          print('[SECURITY] BundleSignatureException: ${e.slug}@${e.version}');
+          setState(() {
+            _signatureError = e.slug;
+            _status = 'Module integrity check failed';
+            _downloadProgress = null;
+          });
+          return; // stop processing further modules; do not navigate to DashboardScreen
         }
       }
 
       setState(() { _downloadProgress = null; });
     } catch (e) {
+      if (e is BundleSignatureException) rethrow;
       print('[LoadingScreen] OTA check failed (continuing): $e');
       setState(() { _downloadProgress = null; });
     }
 
     // Navigate to ShellScreen with registry (or fallback from cache)
     if (!mounted) return;
+    if (_signatureError != null) return;
 
     List<ModuleEntry> modulesToLoad = _registry.isNotEmpty
         ? _registry
@@ -112,12 +120,37 @@ class _LoadingScreenState extends State<LoadingScreen> {
               cdnUrl: '',
               indexUrl: '',
               checksum: '',
+              signature: '',
             ))
         .toList();
   }
 
   @override
   Widget build(BuildContext context) {
+    if (_signatureError != null) {
+      return Scaffold(
+        backgroundColor: const Color(0xFF1A1A2E),
+        body: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.error_outline, color: Colors.redAccent, size: 48),
+              const SizedBox(height: 16),
+              const Text(
+                'Module integrity check failed',
+                style: TextStyle(color: Colors.redAccent, fontSize: 16),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Module: $_signatureError',
+                style: const TextStyle(color: Colors.white54, fontSize: 13),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
     return Scaffold(
       backgroundColor: const Color(0xFF1A1A2E),
       body: Center(
