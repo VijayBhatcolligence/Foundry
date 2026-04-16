@@ -81,6 +81,9 @@ pure web app:
   • Native real-time connectivity monitoring (displayed in Dashboard and modules)
   • Native account management, deletion, and privacy controls
   • SHA-256 integrity verification of all locally stored content
+  • ECDSA P-256 cryptographic signature verification of every downloaded module
+    bundle — only content signed by the organization's private key executes;
+    tampered or unsigned content is rejected before writing to disk
 
 The data collection forms (quality inspection, inventory check) run inside
 WKWebView as a rendering surface. This is the same pattern used by enterprise
@@ -97,7 +100,9 @@ What actually happens:
   - At startup, the app authenticates and verifies the device's locally
     stored HTML/CSS/JavaScript content against the enterprise server
   - If locally cached content is outdated (version mismatch), the new
-    version is downloaded and SHA-256 verified before replacing the local copy
+    version is downloaded, SHA-256 verified, and ECDSA P-256 signature
+    verified against a public key hardcoded in the binary before replacing
+    the local copy — unsigned or tampered content is never written to disk
   - This content is then served from LOCAL DEVICE STORAGE to WKWebView
 
 WKWebView executing JavaScript is explicitly sanctioned by Apple. This is
@@ -158,3 +163,9 @@ Both modules are pre-cached on device and work fully offline.
 
 4. **Enterprise use case**: This is a B2B tool. Modules are controlled by the
    organization's IT/backend team — not end users or third parties.
+
+5. **ECDSA bundle signing (Phase 12)**: Every module bundle is signed with an
+   ECDSA P-256 private key held only by the organization's administrator. The
+   app verifies this signature before executing any downloaded content. This is
+   a stronger trust model than most native apps — equivalent to Apple's own
+   code signing, applied to the JavaScript layer.

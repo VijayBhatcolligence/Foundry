@@ -96,6 +96,8 @@ No user-generated content, no purchases, no objectionable content.
 Foundry is an internal enterprise application. Access requires organization-issued credentials — reviewers can use the test account provided below.
 
 The app downloads HTML and JavaScript web content at runtime to render operational workflows inside a native WKWebView (iOS/macOS) or WebView (Android). No native executable code is downloaded. This is functionally equivalent to a browser loading a web page, with an additional native bridge for camera, barcode scanning, and device secure storage. The downloaded content only extends the app's core enterprise workflow functionality.
+
+Every downloaded module bundle is verified with an ECDSA P-256 digital signature before being written to device storage. The signing private key is held exclusively by the organization's IT administrator. Any content not signed by that key is rejected by the app before execution. This ensures only administrator-approved content ever runs in the app.
 ```
 
 ---
