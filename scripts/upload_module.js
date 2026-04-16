@@ -76,11 +76,14 @@ if (!keyPath) {
   process.exit(1);
 }
 
-// Credentials — fall back to hardcoded values if env vars are not set
-const supabaseUrl = process.env.SUPABASE_URL
-  || 'https://gbjmxskxkqyfvqifvelg.supabase.co';
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY
-  || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdiam14c2t4a3F5ZnZxaWZ2ZWxnIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NTExMjY2NywiZXhwIjoyMDkwNjg4NjY3fQ.Gc32SV0rvjJbjX5jMN3HZwKlluSSqZ_SqxxJUUlk-Cw';
+// Validate required environment variables before any I/O
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+if (!supabaseUrl || !supabaseKey) {
+  process.stderr.write('Error: SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY environment variables are required\n');
+  process.exit(1);
+}
 
 // ---------------------------------------------------------------------------
 // Main async pipeline
