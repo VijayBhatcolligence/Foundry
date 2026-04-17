@@ -34,7 +34,7 @@ class _ModuleWebViewState extends State<ModuleWebView> {
   late final ShellBridge _bridge;
   bool _pageLoaded = false;
 
-  StreamSubscription<ConnectivityResult>? _connectivitySubscription;
+  StreamSubscription<List<ConnectivityResult>>? _connectivitySubscription;
   bool _wasOnline = false;
 
   @override
@@ -93,8 +93,8 @@ class _ModuleWebViewState extends State<ModuleWebView> {
   void _subscribeToConnectivity() {
     _connectivitySubscription = Connectivity()
         .onConnectivityChanged
-        .listen((ConnectivityResult result) {
-      final isOnline = result != ConnectivityResult.none;
+        .listen((List<ConnectivityResult> results) {
+      final isOnline = results.any((r) => r != ConnectivityResult.none);
       if (isOnline && !_wasOnline) {
         // Transitioned from offline to online — notify JS
         _dispatchOnlineEvent();

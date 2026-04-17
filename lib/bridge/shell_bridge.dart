@@ -102,12 +102,12 @@ class ShellBridge {
           }).toJson();
 
         case 'getNetworkState':
-          final result = await Connectivity().checkConnectivity();
-          final isOnline = result != ConnectivityResult.none;
+          final results = await Connectivity().checkConnectivity();
+          final isOnline = results.any((r) => r != ConnectivityResult.none);
           String type = 'none';
-          if (result == ConnectivityResult.wifi) {
+          if (results.contains(ConnectivityResult.wifi)) {
             type = 'wifi';
-          } else if (result == ConnectivityResult.mobile) {
+          } else if (results.contains(ConnectivityResult.mobile)) {
             type = 'mobile';
           } else if (isOnline) {
             type = 'other';
