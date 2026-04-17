@@ -38,7 +38,7 @@ dependencies:
 
   # Phase 4: Native capabilities
   image_picker: ^1.1.2
-  mobile_scanner: ^6.0.0
+  mobile_scanner: ^7.0.0
 
   # Phase 12: Bundle signing verification
   cryptography: ^2.7.0

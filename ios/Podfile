@@ -39,11 +39,11 @@ post_install do |installer|
   installer.pods_project.targets.each do |target|
     flutter_additional_ios_build_settings(target)
     # Enforce minimum deployment target across all pods.
-    # Required for Firebase 11.x + mobile_scanner 6.x — some transitive pods
-    # (GoogleDataTransport, MLKitCommon) declare a lower minimum which triggers
-    # Xcode linker errors on Apple Silicon CI runners.
+    # Required for Firebase 11.x + mobile_scanner 7.x — some transitive pods
+    # declare a lower minimum which triggers Xcode linker errors on Apple
+    # Silicon CI runners and arm64 simulators on iOS 26+.
     target.build_configurations.each do |config|
-      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '15.0'
+      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '15.5'
     end
   end
 end
