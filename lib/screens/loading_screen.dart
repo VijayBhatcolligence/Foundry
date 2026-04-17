@@ -6,7 +6,12 @@ import 'login_screen.dart';
 import 'dashboard_screen.dart';
 
 class LoadingScreen extends StatefulWidget {
-  const LoadingScreen({super.key});
+  /// Optional token passed directly from LoginScreen after a fresh login.
+  /// Avoids a Keychain re-read on iPad where the write may not have
+  /// propagated by the time initState fires.
+  final String? initialToken;
+
+  const LoadingScreen({super.key, this.initialToken});
 
   @override
   State<LoadingScreen> createState() => _LoadingScreenState();
@@ -25,16 +30,21 @@ class _LoadingScreenState extends State<LoadingScreen> {
   }
 
   Future<void> _checkAuth() async {
-    // Validate token (auto-refresh if expired)
+    // Use the token passed from LoginScreen if available (avoids Keychain
+    // timing race on iPad); otherwise read from secure storage (app restart).
     String token;
-    try {
-      token = await AuthService().getValidToken();
-    } catch (e) {
-      if (!mounted) return;
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (_) => const LoginScreen()),
-      );
-      return;
+    if (widget.initialToken != null && widget.initialToken!.isNotEmpty) {
+      token = widget.initialToken!;
+    } else {
+      try {
+        token = await AuthService().getValidToken();
+      } catch (e) {
+        if (!mounted) return;
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (_) => const LoginScreen()),
+        );
+        return;
+      }
     }
 
     // Sync content
