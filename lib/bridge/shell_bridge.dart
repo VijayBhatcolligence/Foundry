@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:path_provider/path_provider.dart';
 import '../services/auth_service.dart';
 import 'barcode_scanner_screen.dart';
@@ -102,12 +101,12 @@ class ShellBridge {
           }).toJson();
 
         case 'getNetworkState':
-          final result = await Connectivity().checkConnectivity();
-          final isOnline = result != ConnectivityResult.none;
+          final results = await Connectivity().checkConnectivity();
+          final isOnline = results.any((r) => r != ConnectivityResult.none);
           String type = 'none';
-          if (result == ConnectivityResult.wifi) {
+          if (results.contains(ConnectivityResult.wifi)) {
             type = 'wifi';
-          } else if (result == ConnectivityResult.mobile) {
+          } else if (results.contains(ConnectivityResult.mobile)) {
             type = 'mobile';
           } else if (isOnline) {
             type = 'other';

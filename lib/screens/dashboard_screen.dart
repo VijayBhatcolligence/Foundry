@@ -1,3 +1,4 @@
+// ignore_for_file: deprecated_member_use
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -34,7 +35,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   // Connectivity
   bool _isOnline = true;
-  late StreamSubscription<ConnectivityResult> _connectivitySub;
+  late StreamSubscription<List<ConnectivityResult>> _connectivitySub;
 
   @override
   void initState() {
@@ -60,18 +61,18 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   void _initConnectivity() {
-    _connectivitySub = Connectivity().onConnectivityChanged.listen((result) {
+    _connectivitySub = Connectivity().onConnectivityChanged.listen((results) {
       if (mounted) {
         setState(() {
-          _isOnline = result != ConnectivityResult.none;
+          _isOnline = results.any((r) => r != ConnectivityResult.none);
         });
       }
     });
     // Check initial state
-    Connectivity().checkConnectivity().then((result) {
+    Connectivity().checkConnectivity().then((results) {
       if (mounted) {
         setState(() {
-          _isOnline = result != ConnectivityResult.none;
+          _isOnline = results.any((r) => r != ConnectivityResult.none);
         });
       }
     });
