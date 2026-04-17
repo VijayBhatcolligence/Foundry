@@ -9,7 +9,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
-	<string>Foundry App</string>
+	<string>Foundry Position</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -52,11 +52,13 @@
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>NSCameraUsageDescription</key>
-	<string>Foundry App needs camera access to scan barcodes and capture photos for quality inspections and inventory reports.</string>
+	<string>Foundry Position needs camera access to scan barcodes and capture photos for quality inspections and inventory reports.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Foundry Position may use the microphone if a loaded module requires audio capture.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Foundry App needs photo library access to attach existing photos to inspection and inventory reports.</string>
+	<string>Foundry Position needs photo library access to attach existing photos to inspection and inventory reports.</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
-	<string>Foundry App needs permission to save captured photos to your photo library.</string>
+	<string>Foundry Position needs permission to save captured photos to your photo library.</string>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
