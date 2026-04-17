@@ -23,7 +23,7 @@ class _LoginScreenState extends State<LoginScreen> {
     });
 
     try {
-      final user = await AuthService().login(
+      await AuthService().login(
         _emailCtrl.text.trim(),
         _passCtrl.text,
       );
