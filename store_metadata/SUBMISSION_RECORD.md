@@ -162,6 +162,7 @@ Conducted against official Apple App Store Review Guidelines. Overall passing li
 | Encryption compliance | ITSAppUsesNonExemptEncryption=false | 1 |
 | Placeholder icon (2.3.8) | Regenerated 21 sizes from source image, fixed nested folder | 2 |
 | iPad login redirect (2.1) | post-frame callback on LoadingScreen._checkAuth | 2 |
+| iPad login redirect (2.1) | JWT passed directly from LoginScreen via initialToken — eliminates Keychain timing race on iPad M3 | 3 |
 | Review notes missing 4.7 | Added explicit 4.7.1/4.7.2/4.7.4 compliance language | 2 |
 
 ---
@@ -177,10 +178,15 @@ Conducted against official Apple App Store Review Guidelines. Overall passing li
 | 2 | 2.1(a) | iPad login redirect after sign-in | post-frame callback on LoadingScreen |
 
 ### Attempt 2 — 2026-04-15
-**Status:** Submitted — awaiting review
+**Status:** Rejected — 2026-04-16
 
-**If rejected, record here:**
-- Rejection reason:
-- Guideline number:
-- What to change:
-- Resubmit date:
+| # | Guideline | Issue | Fix Applied |
+|---|-----------|-------|-------------|
+| 1 | 2.1(a) | iPad login redirect after sign-in (iPad Air M3 / iPadOS 26.4.1) | Pass JWT directly from LoginScreen to LoadingScreen via initialToken param — eliminates Keychain re-read timing race on iPad |
+
+### Attempt 3 — pending
+**Status:** Not yet submitted — fix in PR phase-12-bundle-signing
+
+**Changes from Attempt 2:**
+- iPad login fix: token passed directly from LoginScreen → LoadingScreen (no Keychain re-read)
+- Phase 12 ECDSA bundle signing included
