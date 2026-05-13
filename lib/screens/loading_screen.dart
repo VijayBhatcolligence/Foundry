@@ -3,11 +3,15 @@ import '../services/auth_service.dart';
 import '../services/module_registry_service.dart';
 import '../services/module_download_service.dart';
 import 'login_screen.dart';
-import 'module_list_screen.dart';
 import 'dashboard_screen.dart';
 
 class LoadingScreen extends StatefulWidget {
-  const LoadingScreen({super.key});
+  /// Optional token passed directly from LoginScreen after a fresh login.
+  /// Avoids a Keychain re-read on iPad where the write may not have
+  /// propagated by the time initState fires.
+  final String? initialToken;
+
+  const LoadingScreen({super.key, this.initialToken});
 
   @override
   State<LoadingScreen> createState() => _LoadingScreenState();
@@ -16,26 +20,31 @@ class LoadingScreen extends StatefulWidget {
 class _LoadingScreenState extends State<LoadingScreen> {
   String _status = 'Loading...';
   double? _downloadProgress;
-  String _currentModuleName = '';
+  String? _signatureError;
   List<ModuleEntry> _registry = [];
 
   @override
   void initState() {
     super.initState();
-    _checkAuth();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _checkAuth());
   }
 
   Future<void> _checkAuth() async {
-    // Validate token (auto-refresh if expired)
+    // Use the token passed from LoginScreen if available (avoids Keychain
+    // timing race on iPad); otherwise read from secure storage (app restart).
     String token;
-    try {
-      token = await AuthService().getValidToken();
-    } catch (e) {
-      if (!mounted) return;
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (_) => const LoginScreen()),
-      );
-      return;
+    if (widget.initialToken != null && widget.initialToken!.isNotEmpty) {
+      token = widget.initialToken!;
+    } else {
+      try {
+        token = await AuthService().getValidToken();
+      } catch (e) {
+        if (!mounted) return;
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (_) => const LoginScreen()),
+        );
+        return;
+      }
     }
 
     // Sync content
@@ -57,7 +66,6 @@ class _LoadingScreenState extends State<LoadingScreen> {
         if (!mounted) return;
         setState(() {
           _status = 'Loading ${entry.name}...';
-          _currentModuleName = entry.name;
         });
 
         try {
@@ -81,17 +89,27 @@ class _LoadingScreenState extends State<LoadingScreen> {
               });
             },
           );
+        } on BundleSignatureException catch (e) {
+          print('[SECURITY] BundleSignatureException: ${e.slug}@${e.version}');
+          setState(() {
+            _signatureError = e.slug;
+            _status = 'Module integrity check failed';
+            _downloadProgress = null;
+          });
+          return; // stop processing further modules; do not navigate to DashboardScreen
         }
       }
 
       setState(() { _downloadProgress = null; });
     } catch (e) {
+      if (e is BundleSignatureException) rethrow;
       print('[LoadingScreen] OTA check failed (continuing): $e');
       setState(() { _downloadProgress = null; });
     }
 
     // Navigate to ShellScreen with registry (or fallback from cache)
     if (!mounted) return;
+    if (_signatureError != null) return;
 
     List<ModuleEntry> modulesToLoad = _registry.isNotEmpty
         ? _registry
@@ -112,12 +130,37 @@ class _LoadingScreenState extends State<LoadingScreen> {
               cdnUrl: '',
               indexUrl: '',
               checksum: '',
+              signature: '',
             ))
         .toList();
   }
 
   @override
   Widget build(BuildContext context) {
+    if (_signatureError != null) {
+      return Scaffold(
+        backgroundColor: const Color(0xFF1A1A2E),
+        body: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.error_outline, color: Colors.redAccent, size: 48),
+              const SizedBox(height: 16),
+              const Text(
+                'Module integrity check failed',
+                style: TextStyle(color: Colors.redAccent, fontSize: 16),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Module: $_signatureError',
+                style: const TextStyle(color: Colors.white54, fontSize: 13),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
     return Scaffold(
       backgroundColor: const Color(0xFF1A1A2E),
       body: Center(

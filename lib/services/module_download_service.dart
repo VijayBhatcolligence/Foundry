@@ -5,12 +5,22 @@ import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as path;
 import 'module_registry_service.dart';
+import '../security/bundle_verifier.dart';
 
 class ChecksumMismatchException implements Exception {
   final String slug;
   ChecksumMismatchException(this.slug);
   @override
   String toString() => 'ChecksumMismatchException: $slug bundle.js checksum failed';
+}
+
+class BundleSignatureException implements Exception {
+  final String slug;
+  final String version;
+  BundleSignatureException({required this.slug, required this.version});
+  @override
+  String toString() =>
+      'BundleSignatureException: $slug@$version ECDSA signature invalid';
 }
 
 class ModuleDownloadService {
@@ -68,6 +78,16 @@ class ModuleDownloadService {
         if (digest.toString() != entry.checksum) {
           throw ChecksumMismatchException(entry.slug);
         }
+      }
+
+      // Step 3: Verify ECDSA signature (skip if signature is empty — legacy unsigned module)
+      if (entry.signature.isNotEmpty) {
+        final valid = await BundleVerifier.verify(bundleBytes, entry.signature);
+        if (!valid) {
+          print('[SECURITY] BundleSignatureException: ${entry.slug}@${entry.version} ECDSA signature invalid');
+          throw BundleSignatureException(slug: entry.slug, version: entry.version);
+        }
+        print('[SECURITY] Signature OK: ${entry.slug}@${entry.version}');
       }
 
       // Write bundle.js

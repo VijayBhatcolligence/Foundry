@@ -1,0 +1,16 @@
+{
+  "product_id": "colligence-foundry",
+  "app_id": "foundry-flutter",
+  "app_slug": "foundry-flutter",
+  "app_kind": "native",
+  "display_name": "Foundry Position",
+  "project_root": "foundry-app/flutter",
+  "release_contract": "foundry-app/flutter/release.contract.json",
+  "secrets_contract": "foundry-app/flutter/secrets.contract.yaml",
+  "runtime_service": "foundry-backend",
+  "identity": {
+    "app_client_id": "foundry-flutter",
+    "audience": "foundry-flutter",
+    "redirect_uris": ["foundry-flutter://callback"]
+  }
+}

@@ -1,20 +1,16 @@
 {
-  "app_slug": "foundry-app",
-  "project_root": "apps/foundry-app",
-  "tag_pattern": "foundry-app-v*",
-  "release_channel": "internal",
+  "extends": "../../apps/DEFAULTS.json",
+  "app_slug": "foundry-flutter",
+  "display_name": "Foundry Position",
+  "project_root": "foundry-app/flutter",
+  "tag_pattern": "foundry-flutter-v*",
+  "release_channel": "production",
   "secret_provider": "infisical",
-  "secret_path": "/platform/dev/forge/ci",
-  "artifact_prefix": "foundry-app",
+  "secret_path": "/apps/foundry-flutter/release",
+  "artifact_prefix": "foundry-flutter",
   "version_source": "pubspec",
   "platforms": {
     "ios": {
-      "enabled": true,
-      "runner_label": "macos-flutter-signing",
-      "distribution": "testflight",
-      "bundle_id": "in.colligence.foundry.position"
-    },
-    "macos": {
       "enabled": true,
       "runner_label": "macos-flutter-signing",
       "distribution": "testflight",
@@ -26,10 +22,11 @@
       "distribution": "play_internal",
       "bundle_id": "in.colligence.foundry.position"
     },
+    "macos": {
+      "enabled": false
+    },
     "windows": {
-      "enabled": true,
-      "runner_label": "windows-flutter-release",
-      "distribution": "signed_zip"
+      "enabled": false
     }
   }
 }

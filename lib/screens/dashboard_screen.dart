@@ -35,7 +35,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   // Connectivity
   bool _isOnline = true;
-  late StreamSubscription<List<ConnectivityResult>> _connectivitySub;
+  late StreamSubscription _connectivitySub;
 
   @override
   void initState() {
@@ -61,21 +61,27 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   void _initConnectivity() {
-    _connectivitySub = Connectivity().onConnectivityChanged.listen((results) {
+    _connectivitySub = Connectivity().onConnectivityChanged.listen((result) {
       if (mounted) {
         setState(() {
-          _isOnline = results.any((r) => r != ConnectivityResult.none);
+          _isOnline = _checkOnline(result);
         });
       }
     });
-    // Check initial state
-    Connectivity().checkConnectivity().then((results) {
+    Connectivity().checkConnectivity().then((result) {
       if (mounted) {
         setState(() {
-          _isOnline = results.any((r) => r != ConnectivityResult.none);
+          _isOnline = _checkOnline(result);
         });
       }
     });
+  }
+
+  bool _checkOnline(dynamic result) {
+    if (result is List) {
+      return result.any((r) => r != ConnectivityResult.none);
+    }
+    return result != ConnectivityResult.none;
   }
 
   Future<void> _startServer() async {

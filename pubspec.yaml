@@ -25,7 +25,7 @@ dependencies:
 
   # Network
   http: ^1.1.0
-  connectivity_plus: 5.0.0
+  connectivity_plus: ^6.1.0
 
   # Phase 2: Auth
   flutter_secure_storage: ^9.0.0
@@ -39,6 +39,9 @@ dependencies:
   # Phase 4: Native capabilities
   image_picker: ^1.1.2
   mobile_scanner: ^6.0.0
+
+  # Bundle signing verification (phase-12-bundle-signing)
+  cryptography: ^2.7.0
 
 dev_dependencies:
   flutter_test:
