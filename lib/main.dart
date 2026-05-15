@@ -1,12 +1,36 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:path_provider/path_provider.dart';
 import 'firebase_options.dart';
 import 'screens/loading_screen.dart';
+import 'services/auth_service.dart';
 
 bool _firebaseReady = false;
 
 bool get firebaseReady => _firebaseReady;
+
+const _appVersion = '3.0.1';
+
+/// Clears stored session on fresh install or app update.
+/// Uses a file in the documents directory (wiped on reinstall, unlike Keychain).
+Future<void> _clearSessionIfNewInstallOrUpdate() async {
+  try {
+    final dir = await getApplicationDocumentsDirectory();
+    final marker = File('${dir.path}/.foundry_version');
+    if (marker.existsSync()) {
+      final stored = marker.readAsStringSync().trim();
+      if (stored == _appVersion) return; // same version, keep session
+    }
+    // First launch, reinstall, or version change — clear session
+    debugPrint('[main] New install or update detected — clearing session');
+    await AuthService().logout();
+    marker.writeAsStringSync(_appVersion);
+  } catch (e) {
+    debugPrint('[main] Session check failed: $e');
+  }
+}
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -25,6 +49,8 @@ void main() async {
     debugPrint('[main] Firebase.initializeApp: $e');
   }
   _firebaseReady = Firebase.apps.isNotEmpty;
+
+  await _clearSessionIfNewInstallOrUpdate();
 
   runApp(const FoundryApp());
 }
