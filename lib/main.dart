@@ -14,13 +14,8 @@ void main() async {
     debugPrint('[main] dotenv.load failed: $e');
   }
 
-  // Init Firebase — if GoogleService-Info.plist is missing/invalid the app
-  // must still start so the user sees an error rather than a blank screen.
-  try {
-    await Firebase.initializeApp();
-  } catch (e) {
-    debugPrint('[main] Firebase.initializeApp failed: $e');
-  }
+  // Init Firebase — GoogleService-Info.plist must be in Xcode bundle resources.
+  await Firebase.initializeApp();
 
   runApp(const FoundryApp());
 }
