@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import '../main.dart' show firebaseReady;
 import '../services/auth_service.dart';
 import '../services/module_registry_service.dart';
 import '../services/module_download_service.dart';
@@ -31,6 +32,16 @@ class _LoadingScreenState extends State<LoadingScreen> {
   }
 
   Future<void> _checkAuth() async {
+    // If Firebase failed to init, skip auth check and go straight to login.
+    if (!firebaseReady) {
+      debugPrint('[LoadingScreen] Firebase not ready, going to login');
+      if (!mounted) return;
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (_) => const LoginScreen()),
+      );
+      return;
+    }
+
     // Use the token passed from LoginScreen if available (avoids Keychain
     // timing race on iPad); otherwise read from secure storage (app restart).
     String token;

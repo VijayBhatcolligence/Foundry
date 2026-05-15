@@ -2,20 +2,27 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'screens/loading_screen.dart';
+import 'screens/login_screen.dart';
+
+bool _firebaseReady = false;
+
+bool get firebaseReady => _firebaseReady;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Load .env — if missing or malformed, app still launches (API calls
-  // will fail gracefully and the user lands on the login screen).
   try {
     await dotenv.load(fileName: '.env');
   } catch (e) {
     debugPrint('[main] dotenv.load failed: $e');
   }
 
-  // Init Firebase — GoogleService-Info.plist must be in Xcode bundle resources.
-  await Firebase.initializeApp();
+  try {
+    await Firebase.initializeApp();
+    _firebaseReady = true;
+  } catch (e) {
+    debugPrint('[main] Firebase.initializeApp failed: $e');
+  }
 
   runApp(const FoundryApp());
 }
