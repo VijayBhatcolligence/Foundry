@@ -23,20 +23,17 @@ class _LoginScreenState extends State<LoginScreen> {
     });
 
     try {
-      await AuthService().login(
+      final result = await AuthService().login(
         _emailCtrl.text.trim(),
         _passCtrl.text,
       );
-      // Retrieve the token that was just written to Keychain.
-      // Passing it directly to LoadingScreen avoids an iPad Keychain
-      // timing race where a re-read immediately after write returns null.
-      final token = await AuthService().getToken();
 
       if (!mounted) return;
-      // Route through LoadingScreen so OTA check runs after login
+      // Pass token directly from login response — avoids iOS Keychain
+      // race where re-reading immediately after write returns null.
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
-          builder: (_) => LoadingScreen(initialToken: token),
+          builder: (_) => LoadingScreen(initialToken: result.token),
         ),
       );
     } catch (e) {

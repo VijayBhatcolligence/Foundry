@@ -90,8 +90,10 @@ class AuthService {
     return jsonDecode(raw) as Map<String, dynamic>;
   }
 
-  /// Sign in with email/password → get Firebase ID token → exchange for JWT
-  Future<Map<String, dynamic>> login(String email, String password) async {
+  /// Sign in with email/password → get Firebase ID token → exchange for JWT.
+  /// Returns a record with the JWT token and user map so the caller can pass
+  /// the token directly without re-reading from Keychain (avoids iOS race).
+  Future<({String token, Map<String, dynamic> user})> login(String email, String password) async {
     // 1. Firebase sign-in
     final credential = await _auth.signInWithEmailAndPassword(
       email: email,
@@ -121,7 +123,7 @@ class AuthService {
     await _storage.write(key: _tokenKey, value: token);
     await _storage.write(key: _userKey, value: jsonEncode(user));
 
-    return user;
+    return (token: token, user: user);
   }
 
   Future<void> logout() async {
