@@ -15,16 +15,20 @@ class AuthService {
   static const _tokenKey = 'foundry_jwt';
   static const _userKey = 'foundry_user';
 
+  String? _latestToken;
+
   String get _apiBase => dotenv.env['API_BASE_URL'] ?? '';
 
   // ── Public API ─────────────────────────────────────────────────────────────
 
   Future<bool> isLoggedIn() async {
-    final token = await _storage.read(key: _tokenKey);
+    final token = await getToken();
     return token != null && token.isNotEmpty;
   }
 
-  Future<String?> getToken() => _storage.read(key: _tokenKey);
+  Future<String?> getToken() async {
+    return await _storage.read(key: _tokenKey) ?? _latestToken;
+  }
 
   /// Returns a valid JWT, refreshing via Firebase if the stored token is
   /// expired or expiring within 60 seconds.
@@ -70,12 +74,13 @@ class AuthService {
     final response = await http.post(
       Uri.parse('${dotenv.env['API_BASE_URL']}/api/auth/login'),
       headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({'idToken': firebaseIdToken}),
+      body: jsonEncode({'firebase_token': firebaseIdToken}),
     );
 
     if (response.statusCode == 200 || response.statusCode == 201) {
       final data = jsonDecode(response.body) as Map<String, dynamic>;
       final newToken = data['token'] as String;
+      _latestToken = newToken;
       await _storage.write(key: _tokenKey, value: newToken);
       return newToken;
     } else {
@@ -124,6 +129,7 @@ class AuthService {
     final user = (data['user'] as Map<String, dynamic>?) ?? {};
 
     // 4. Persist
+    _latestToken = token;
     await _storage.write(key: _tokenKey, value: token);
     await _storage.write(key: _userKey, value: jsonEncode(user));
 
@@ -131,6 +137,7 @@ class AuthService {
   }
 
   Future<void> logout() async {
+    _latestToken = null;
     await _auth.signOut();
     await _storage.delete(key: _tokenKey);
     await _storage.delete(key: _userKey);
