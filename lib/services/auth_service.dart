@@ -110,14 +110,18 @@ class AuthService {
       body: jsonEncode({'firebase_token': idToken}),
     );
 
-    if (response.statusCode != 200) {
-      final body = jsonDecode(response.body);
-      throw Exception(body['error'] ?? 'Login failed');
+    if (response.statusCode != 200 && response.statusCode != 201) {
+      Map<String, dynamic> body = {};
+      try { body = jsonDecode(response.body) as Map<String, dynamic>; } catch (_) {}
+      throw Exception(body['error'] ?? 'Login failed (${response.statusCode})');
     }
 
     final data = jsonDecode(response.body) as Map<String, dynamic>;
-    final token = data['token'] as String;
-    final user = data['user'] as Map<String, dynamic>;
+    final token = data['token'] as String?;
+    if (token == null || token.isEmpty) {
+      throw Exception('Server returned no token');
+    }
+    final user = (data['user'] as Map<String, dynamic>?) ?? {};
 
     // 4. Persist
     await _storage.write(key: _tokenKey, value: token);

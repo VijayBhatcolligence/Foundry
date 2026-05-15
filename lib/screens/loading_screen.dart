@@ -121,13 +121,19 @@ class _LoadingScreenState extends State<LoadingScreen> {
       setState(() { _downloadProgress = null; });
     }
 
-    // Navigate to ShellScreen with registry (or fallback from cache)
+    // Navigate to DashboardScreen with registry (or fallback from cache)
     if (!mounted) return;
     if (_signatureError != null) return;
 
-    List<ModuleEntry> modulesToLoad = _registry.isNotEmpty
-        ? _registry
-        : _buildFallbackFromCache(await ModuleRegistryService.loadLocalCache());
+    List<ModuleEntry> modulesToLoad = _registry;
+    if (modulesToLoad.isEmpty) {
+      try {
+        final cache = await ModuleRegistryService.loadLocalCache();
+        modulesToLoad = _buildFallbackFromCache(cache);
+      } catch (e) {
+        debugPrint('[LoadingScreen] Cache load failed: $e');
+      }
+    }
 
     if (!mounted) return;
     Navigator.of(context).pushReplacement(

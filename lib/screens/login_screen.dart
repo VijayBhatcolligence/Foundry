@@ -29,6 +29,7 @@ class _LoginScreenState extends State<LoginScreen> {
       );
 
       if (!mounted) return;
+      setState(() => _loading = false);
       // Pass token directly from login response — avoids iOS Keychain
       // race where re-reading immediately after write returns null.
       Navigator.of(context).pushReplacement(
@@ -36,10 +37,15 @@ class _LoginScreenState extends State<LoginScreen> {
           builder: (_) => LoadingScreen(initialToken: result.token),
         ),
       );
+      return;
     } catch (e) {
-      setState(() => _error = e.toString().replaceFirst('Exception: ', ''));
-    } finally {
-      if (mounted) setState(() => _loading = false);
+      debugPrint('[LoginScreen] Login error: $e');
+      if (mounted) {
+        setState(() {
+          _loading = false;
+          _error = e.toString().replaceAll(RegExp(r'^(Exception|FirebaseAuthException): ?'), '');
+        });
+      }
     }
   }
 
@@ -88,10 +94,17 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 if (_error != null) ...[
                   const SizedBox(height: 12),
-                  Text(
-                    _error!,
-                    style: const TextStyle(color: Colors.redAccent, fontSize: 13),
-                    textAlign: TextAlign.center,
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.redAccent.withOpacity(0.15),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      _error!,
+                      style: const TextStyle(color: Colors.redAccent, fontSize: 14),
+                      textAlign: TextAlign.center,
+                    ),
                   ),
                 ],
                 const SizedBox(height: 24),
