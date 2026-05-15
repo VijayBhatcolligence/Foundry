@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'firebase_options.dart';
 import 'screens/loading_screen.dart';
 import 'screens/login_screen.dart';
 
@@ -18,7 +19,9 @@ void main() async {
   }
 
   try {
-    await Firebase.initializeApp();
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
     _firebaseReady = true;
   } catch (e) {
     debugPrint('[main] Firebase.initializeApp failed: $e');
