@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import '../services/auth_service.dart';
 import '../services/module_registry_service.dart';
@@ -39,6 +40,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
       try {
         token = await AuthService().getValidToken();
       } catch (e) {
+        debugPrint('[LoadingScreen] No valid token: $e');
         if (!mounted) return;
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(builder: (_) => const LoginScreen()),
@@ -50,7 +52,8 @@ class _LoadingScreenState extends State<LoadingScreen> {
     // Sync content
     setState(() => _status = 'Preparing your workspace...');
     try {
-      final registry = await ModuleRegistryService.fetchRegistry(token);
+      final registry = await ModuleRegistryService.fetchRegistry(token)
+          .timeout(const Duration(seconds: 15));
       _registry = registry;
       final pruned = await ModuleRegistryService.pruneRevokedModules(
         registry.map((m) => m.slug).toList(),

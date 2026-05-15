@@ -6,11 +6,21 @@ import 'screens/loading_screen.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Load .env (API_BASE_URL etc.)
-  await dotenv.load(fileName: '.env');
+  // Load .env — if missing or malformed, app still launches (API calls
+  // will fail gracefully and the user lands on the login screen).
+  try {
+    await dotenv.load(fileName: '.env');
+  } catch (e) {
+    debugPrint('[main] dotenv.load failed: $e');
+  }
 
-  // Init Firebase (google-services.json already in android/app/)
-  await Firebase.initializeApp();
+  // Init Firebase — if GoogleService-Info.plist is missing/invalid the app
+  // must still start so the user sees an error rather than a blank screen.
+  try {
+    await Firebase.initializeApp();
+  } catch (e) {
+    debugPrint('[main] Firebase.initializeApp failed: $e');
+  }
 
   runApp(const FoundryApp());
 }
