@@ -21,10 +21,10 @@ void main() async {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
-    _firebaseReady = true;
   } catch (e) {
-    debugPrint('[main] Firebase.initializeApp failed: $e');
+    debugPrint('[main] Firebase.initializeApp: $e');
   }
+  _firebaseReady = Firebase.apps.isNotEmpty;
 
   runApp(const FoundryApp());
 }
