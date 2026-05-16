@@ -14,6 +14,8 @@ class AuthService {
 
   static const _tokenKey = 'foundry_jwt';
   static const _userKey = 'foundry_user';
+  static const _loginTimestampKey = 'foundry_login_ts';
+  static const sessionMaxDays = 7;
 
   String? _latestToken;
 
@@ -24,6 +26,18 @@ class AuthService {
   Future<bool> isLoggedIn() async {
     final token = await getToken();
     return token != null && token.isNotEmpty;
+  }
+
+  /// Returns true if the session is older than [sessionMaxDays].
+  Future<bool> isSessionExpired() async {
+    final ts = await _storage.read(key: _loginTimestampKey);
+    if (ts == null) return true;
+    try {
+      final loginTime = DateTime.parse(ts);
+      return DateTime.now().difference(loginTime).inDays >= sessionMaxDays;
+    } catch (_) {
+      return true;
+    }
   }
 
   Future<String?> getToken() async {
@@ -132,6 +146,7 @@ class AuthService {
     _latestToken = token;
     await _storage.write(key: _tokenKey, value: token);
     await _storage.write(key: _userKey, value: jsonEncode(user));
+    await _storage.write(key: _loginTimestampKey, value: DateTime.now().toIso8601String());
 
     return (token: token, user: user);
   }
@@ -141,6 +156,7 @@ class AuthService {
     await _auth.signOut();
     await _storage.delete(key: _tokenKey);
     await _storage.delete(key: _userKey);
+    await _storage.delete(key: _loginTimestampKey);
   }
 
   /// Delete the user's account from backend, Firebase, and local storage.

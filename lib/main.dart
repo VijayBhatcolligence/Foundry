@@ -51,8 +51,24 @@ void main() async {
   _firebaseReady = Firebase.apps.isNotEmpty;
 
   await _clearSessionIfNewInstallOrUpdate();
+  await _clearSessionIfExpired();
 
   runApp(const FoundryApp());
+}
+
+/// Clears session if older than 7 days.
+Future<void> _clearSessionIfExpired() async {
+  try {
+    if (await AuthService().isSessionExpired()) {
+      final hasToken = await AuthService().isLoggedIn();
+      if (hasToken) {
+        debugPrint('[main] Session older than ${AuthService.sessionMaxDays} days — clearing');
+        await AuthService().logout();
+      }
+    }
+  } catch (e) {
+    debugPrint('[main] Session expiry check failed: $e');
+  }
 }
 
 class FoundryApp extends StatelessWidget {
